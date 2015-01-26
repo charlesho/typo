@@ -70,7 +70,7 @@ class Admin::ContentController < Admin::BaseController
       page["attachment_add_#{params[:id]}"].remove
       page.insert_html :bottom, 'attachments',
           :partial => 'admin/content/attachment',
-          :locals => { :attachment_num => params[:id], :hidden => true }
+          :locals => { :attachment_num => params[:id], :hidden => false }
       page.visual_effect(:toggle_appear, "attachment_#{params[:id]}")
     end
   end
