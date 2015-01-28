@@ -628,7 +628,54 @@ describe Article do
         article.should be == already_exist_article
       end
     end
+    context "when merge with ID exists" do
+      it 'should create and return a single article' do
+        merged_article = @article1.merge_with(@article2.id)
 
+        Article.find_by_id(@article2.id).should be_nil
+        Article.find_by_id(@article1.id).should_not be_nil
+        Article.find_by_id(@article1.id).should == merged_article
+      end
+
+      it 'should create an article with the text of both original articles' do
+        @article1.update_attributes(:body => "Article 1 body")
+        @article2.update_attributes(:body => "Article 2 body")
+
+        merged_article = @article1.merge_with(@article2.id)
+
+        Article.find_by_id(@article1.id).body.should == "Article 1 body\nArticle 2 body"
+      end
+
+      it 'should carry over the comments from both merged articles' do
+        Factory.create(:comment, :article => @article1)
+        Factory.create(:comment, :article => @article2)
+
+        @article1.merge_with(@article2.id)
+
+        @article1.comments.count.should == 2
+      end
+
+      it 'should create a merged article with the title from one of the articles' do
+        title1 = @article1.title = "title1"
+        title2 = @article2.title = "title2"
+
+        merged_article = @article1.merge_with(@article2.id)
+
+        merged_article.title.should == title1
+        merged_article.title.should_not == title2
+      end
+
+      it 'should create a merged article with the author from one of the articles' do
+        author1 = @article1.author = "author1"
+        author2 = @article2.author = "author2"
+
+        merged_article = @article1.merge_with(@article2.id)
+
+        merged_article.author.should == author1
+        merged_article.author.should_not == author2
+      end
+
+    end
   end
 end
 
